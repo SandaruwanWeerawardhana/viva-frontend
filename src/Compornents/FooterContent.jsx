@@ -16,7 +16,7 @@ function FooterContent() {
             <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
               © 2025{" "}
               <a href="" className="hover:underline">
-                Solo Rent
+                Sandaruwan Weerawardhana
               </a>
               . All Rights Reserved.
             </span>
