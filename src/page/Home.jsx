@@ -10,52 +10,9 @@ import {
   Save,
 } from "lucide-react";
 
-// Sample initial employee data
-const initialEmployees = [
-  {
-    id: 1,
-    name: "John Smith",
-    position: "Frontend Developer",
-    department: "Engineering",
-    email: "john@example.com",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    position: "UX Designer",
-    department: "Design",
-    email: "sarah@example.com",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    position: "Project Manager",
-    department: "Management",
-    email: "michael@example.com",
-    status: "On Leave",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    position: "Backend Developer",
-    department: "Engineering",
-    email: "emily@example.com",
-    status: "Active",
-  },
-  {
-    id: 5,
-    name: "Robert Wilson",
-    position: "HR Specialist",
-    department: "Human Resources",
-    email: "robert@example.com",
-    status: "Inactive",
-  },
-];
 
 const Home = () => {
-  const [employees, setEmployees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
@@ -113,32 +70,32 @@ const Home = () => {
   }, []);
 
   const handleAddEmployee = async () => {
-    if (
-      newEmployee.name &&
-      newEmployee.position &&
-      newEmployee.department &&
-      newEmployee.email
-    ) {
-      const response = await fetch("http://localhost:8080/api/employees", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newEmployee),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add employee");
+    if (newEmployee.name && newEmployee.department && newEmployee.email) {
+      try {
+        const response = await fetch("http://localhost:8080/api/employees", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newEmployee),
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to add employee");
+        }
+  
+        const addedEmployee = await response.json();
+        setEmployees([...employees, addedEmployee]);
+  
+        setNewEmployee({ name: "", department: "", email: "" });
+        setShowAddForm(false);
+      } catch (error) {
+        console.error("Error adding employee:", error);
+        alert("Failed to add employee. Please try again.");
       }
-
-      const addedEmployee = await response.json();
-      setEmployees([...employees, addedEmployee]);
-
-      setNewEmployee({ name: "", department: "", email: "" });
-      setShowAddForm(false);
     }
   };
-
+  
   // Handle editing an employee
   const handleEditEmployee = (employee) => {
     setEditingEmployee({ ...employee });
@@ -178,9 +135,22 @@ const Home = () => {
     }
   };
 
-  // Handle deleting an employee
-  const handleDeleteEmployee = (id) => {
-    setEmployees(employees.filter((employee) => employee.id !== id));
+ 
+  const handleDeleteEmployee = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/employees/${id}`, {
+        method: "DELETE",
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to delete employee");
+      }
+
+      setEmployees(employees.filter((employee) => employee.id !== id));
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+    }
+
   };
   return (
     <>
@@ -418,20 +388,7 @@ const Home = () => {
                                 }
                               />
                             </td>
-                            <td className="p-3">
-                              <input
-                                type="text"
-                                className="w-full p-1 border border-gray-300 rounded"
-                                value={editingEmployee.position}
-                                onChange={(e) =>
-                                  setEditingEmployee({
-                                    ...editingEmployee,
-                                    position: e.target.value,
-                                  })
-                                }
-                              />
-                            </td>
-
+                    
                             <td className="p-3">
                               <select
                                 className="w-full p-1 border border-gray-300 rounded"
@@ -443,7 +400,7 @@ const Home = () => {
                                   })
                                 }
                               >
-                                <option value="">Select Department</option>
+                                <option value="">{editingEmployee.department}</option>
                                 <option value="Engineering">HR</option>
                                 <option value="Design">IT</option>
                                 <option value="Management">FINANCE</option>
