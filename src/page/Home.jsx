@@ -9,6 +9,8 @@ import {
   ChevronUp,
   Save,
 } from "lucide-react";
+import Header from "../Compornents/Header";
+import Swal from "sweetalert2";
 
 
 const Home = () => {
@@ -25,24 +27,23 @@ const Home = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState("employees");
 
-  // Filter employees based on search term
+
   const filteredEmployees = employees.filter(
     (employee) =>
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (employee.position && employee.position.toLowerCase().includes(searchTerm.toLowerCase())) ||
       employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
       employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.status.toLowerCase().includes(searchTerm.toLowerCase())
+      (employee.status && employee.status.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Sort employees based on sort field and direction
+
   const sortedEmployees = [...filteredEmployees].sort((a, b) => {
     if (a[sortField] < b[sortField]) return sortDirection === "asc" ? -1 : 1;
     if (a[sortField] > b[sortField]) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
-  // Handle column header click for sorting
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -58,6 +59,11 @@ const Home = () => {
         const response = await fetch("http://localhost:8080/api/employees");
         if (!response.ok) {
           throw new Error("Failed to fetch employees");
+        }else{
+          Swal.fire({
+            title: "successfully!",
+            icon: "success",
+          });
         }
         const data = await response.json();
         setEmployees(data);
@@ -82,6 +88,11 @@ const Home = () => {
   
         if (!response.ok) {
           throw new Error("Failed to add employee");
+        }else{
+          Swal.fire({
+            title: "successfully!",
+            icon: "success",
+          });
         }
   
         const addedEmployee = await response.json();
@@ -94,19 +105,17 @@ const Home = () => {
     }
   };
   
-  // Handle editing an employee
+
   const handleEditEmployee = (employee) => {
     setEditingEmployee({ ...employee });
   };
 
-  // Handle saving edited employee
   const handleSaveEdit = async () => {
     if (editingEmployee) {
       try {
         const response = await fetch(
           `http://localhost:8080/api/employees/${editingEmployee.id}`,
           {
-            // Replace with your API endpoint
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -117,6 +126,11 @@ const Home = () => {
 
         if (!response.ok) {
           throw new Error("Failed to update employee");
+        }else{
+          Swal.fire({
+            title: "successfully!",
+            icon: "success",
+          });
         }
 
         const updatedEmployee = await response.json();
@@ -142,6 +156,11 @@ const Home = () => {
   
       if (!response.ok) {
         throw new Error("Failed to delete employee");
+      }else{
+        Swal.fire({
+          title: " successfully!",
+          icon: "success",
+        });
       }
 
       setEmployees(employees.filter((employee) => employee.id !== id));
@@ -153,9 +172,7 @@ const Home = () => {
   return (
     <>
       <div className="flex flex-col h-screen">
-        <header className="bg-blue-600 text-white p-4">
-          <h1 className="text-2xl font-bold">Employee Management System</h1>
-        </header>
+       <Header></Header>
 
         <main className="flex-1 p-6 bg-gray-100 overflow-auto">
           <div className="flex mb-6 border-b border-gray-300">
@@ -183,6 +200,7 @@ const Home = () => {
 
           {activeTab === "employees" && (
             <div className="bg-white rounded-lg shadow p-6">
+
               {/* Actions Bar */}
               <div className="flex justify-between items-center mb-6">
                 <div className="relative">
@@ -207,7 +225,7 @@ const Home = () => {
                 </button>
               </div>
 
-              {/* Add Employee Form */}
+
               {showAddForm && (
                 <div className="mb-6 p-4 border border-gray-300 rounded-lg bg-gray-50">
                   <h2 className="text-lg font-semibold mb-4">
@@ -436,7 +454,6 @@ const Home = () => {
                             </td>
                           </>
                         ) : (
-                          // View Mode
                           <>
                             <td className="p-3">{employee.id}</td>
                             <td className="p-3">{employee.name}</td>
