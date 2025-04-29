@@ -71,7 +71,6 @@ const Home = () => {
 
   const handleAddEmployee = async () => {
     if (newEmployee.name && newEmployee.department && newEmployee.email) {
-      try {
         const response = await fetch("http://localhost:8080/api/employees", {
           method: "POST",
           headers: {
@@ -79,6 +78,7 @@ const Home = () => {
           },
           body: JSON.stringify(newEmployee),
         });
+         console.log(newEmployee);
   
         if (!response.ok) {
           throw new Error("Failed to add employee");
@@ -86,13 +86,11 @@ const Home = () => {
   
         const addedEmployee = await response.json();
         setEmployees([...employees, addedEmployee]);
+  console.log(addedEmployee);
   
         setNewEmployee({ name: "", department: "", email: "" });
         setShowAddForm(false);
-      } catch (error) {
-        console.error("Error adding employee:", error);
-        alert("Failed to add employee. Please try again.");
-      }
+     
     }
   };
   
@@ -247,10 +245,10 @@ const Home = () => {
                         }
                       >
                         <option value="">Select Department</option>
-                        <option value="Engineering">HR</option>
-                        <option value="Design">IT</option>
-                        <option value="Management">FINANCE</option>
-                        <option value="Human Resources">OPERATION</option>
+                        <option value="HR">HR</option>
+                        <option value="IT">IT</option>
+                        <option value="FINANCE">FINANCE</option>
+                        <option value="OPERATION">OPERATION</option>
                       </select>
                     </div>
                     <div>
@@ -401,10 +399,10 @@ const Home = () => {
                                 }
                               >
                                 <option value="">{editingEmployee.department}</option>
-                                <option value="Engineering">HR</option>
-                                <option value="Design">IT</option>
-                                <option value="Management">FINANCE</option>
-                                <option value="Human Resources">
+                                <option value="HR">HR</option>
+                                <option value="IT">IT</option>
+                                <option value="FINANCE">FINANCE</option>
+                                <option value="OPERATION">
                                   OPERATION
                                 </option>
                               </select>
