@@ -1,6 +1,6 @@
 import React from "react";
 
-function FooterContent(props) {
+function FooterContent() {
   return (
     <>
       <footer className="bg-gray-800 text-white p-4 text-center text-sm">
