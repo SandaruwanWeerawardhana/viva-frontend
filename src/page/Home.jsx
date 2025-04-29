@@ -12,6 +12,8 @@ import {
 import Header from "../Compornents/Header";
 import Swal from "sweetalert2";
 import Button from "../Compornents/Button";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const Home = () => {
   const [employees, setEmployees] = useState([]);
@@ -93,6 +95,41 @@ const Home = () => {
       }
 
       setNewEmployee({ name: "", department: "", email: "" });
+    }
+  };
+
+  const generatePDF = async () => {
+    try {
+      console.log("Fetching employee data...");
+      const response = await fetch("http://localhost:8080/api/employees");
+      if (!response.ok) {
+        throw new Error("Failed to fetch employee data");
+      }
+      const employees = await response.json();
+      console.log("Employee data:", employees);
+
+      const doc = new jsPDF();
+      console.log("Creating PDF...");
+      doc.text("Employee Report", 14, 10);
+
+      console.log("Adding table...");
+      doc.autoTable({
+        head: [["ID", "Name", "Department", "Email", "Created At", "Updated At"]],
+        body: employees.map((employee) => [
+          employee.id,
+          employee.name,
+          employee.department,
+          employee.email,
+          employee.createAt,
+          employee.updateAt,
+        ]),
+        startY: 20,
+      });
+
+      console.log("Saving PDF...");
+      doc.save("employee_report.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
     }
   };
 
@@ -208,7 +245,13 @@ const Home = () => {
                 <UserPlus size={18} className="mr-2" />
                 Add Employee
               </button>
-
+              <button
+                className="flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                onClick={generatePDF}
+              >
+                <UserPlus size={18} className="mr-2" />
+                Report
+              </button>
             </div>
 
             {showAddForm && (
